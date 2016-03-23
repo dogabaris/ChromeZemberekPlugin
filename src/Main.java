@@ -22,9 +22,9 @@ public class Main  {
         port(666);
 
         Zemberek z = new Zemberek(new TurkiyeTurkcesi());
-        List<Kok> KokList = Lists.newArrayList();
 
         post("/MetinAl", (req, res) -> {
+            List<Kok> KokList = Lists.newArrayList();
             Map<String, String> map = JsonUtil.parse(req.body());
             String textBody = map.get("text");
             TurkishMorphParser parser = TurkishMorphParser.createWithDefaults();
@@ -41,17 +41,20 @@ public class Main  {
                         KokList.add(k);
                     }
                 }
+                kokler = null;
             }
-            FrekansHesapla(KokList);
 
+            FrekansHesapla(KokList);
+            KokList.clear();
             //System.out.println(koklistesi.toString());
 
             return "Başarılı!";
         });
+
+
     }
 
     public static java.sql.Connection baglantiyiSagla() throws Exception {
-
         Class.forName("com.mysql.jdbc.Driver");
         java.sql.Connection baglanti=null;
         baglanti=DriverManager.getConnection("jdbc:mysql://localhost/googleplugin?useUnicode=true&characterEncoding=utf-8","root","");
@@ -83,6 +86,10 @@ public class Main  {
             java.sql.Statement stm = baglanti.createStatement();
             int executeUpdate = stm.executeUpdate(query);
         }
+        koklervefrekansları.clear();
+        siralanmiskoklervefrekansları.clear();
+        baglanti.close();
+
 
     }
 
