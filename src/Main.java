@@ -6,8 +6,6 @@ import java.util.*;
 import static spark.Spark.*;
 
 import com.google.common.collect.Lists;
-import com.mysql.jdbc.Connection;
-import com.mysql.jdbc.Statement;
 import net.zemberek.erisim.Zemberek;
 import net.zemberek.tr.yapi.TurkiyeTurkcesi;
 import net.zemberek.yapi.KelimeTipi;
@@ -18,36 +16,13 @@ import zemberek.morphology.apps.TurkishMorphParser;
  * Created by Master on 21.03.2016.
  */
 public class Main  {
+
+
     public static void main(String[] args) throws IOException, SQLException ,ClassNotFoundException {
         port(666);
 
-      /*MysqlDataSource dataSource = new MysqlDataSource();
-        dataSource.setUser("root");
-        dataSource.setPassword("");
-        dataSource.setServerName("127.0.0.1");
-
-        java.sql.Connection conn = dataSource.getConnection();
-        java.sql.Statement stmt = conn.createStatement();
-        java.sql.ResultSet rs = stmt.executeQuery("SELECT ID FROM USERS");*/
-
-        Class.forName("com.mysql.jdbc.Driver");
-        java.sql.Connection baglanti=null;
-        baglanti=DriverManager.getConnection("jdbc:mysql://localhost/googleplugin","root","");
-
-        String query = "insert into frekanslar(kelime,frekans) values('zaa','1');";
-
-        Statement stm = (Statement) baglanti.createStatement();
-        int executeUpdate = stm.executeUpdate(query);
-
         Zemberek z = new Zemberek(new TurkiyeTurkcesi());
         List<Kok> KokList = Lists.newArrayList();
-        //List<List<String>> KokveFrekans = new ArrayList<List<String>>();
-        //Kelime[] cozumler = z.kelimeCozumle("uçak");
-        //System.out.println(cozumler[0].kok());
-        //System.out.println(kokBulucu.kokBul("gözlükçü"));
-
-        //z.kokBulucu().kokBul();
-
 
         post("/MetinAl", (req, res) -> {
             Map<String, String> map = JsonUtil.parse(req.body());
@@ -75,8 +50,18 @@ public class Main  {
         });
     }
 
-    public static void FrekansHesapla(List<Kok> kokListe){
+    public static java.sql.Connection baglantiyiSagla() throws Exception {
+
+        Class.forName("com.mysql.jdbc.Driver");
+        java.sql.Connection baglanti=null;
+        baglanti=DriverManager.getConnection("jdbc:mysql://localhost/googleplugin?useUnicode=true&characterEncoding=utf-8","root","");
+        return baglanti;
+
+    }
+
+    public static void FrekansHesapla(List<Kok> kokListe) throws Exception {
         Map<String,Integer> koklervefrekansları = new HashMap<String, Integer>();
+        List<Map.Entry<String,Integer>> siralanmiskoklervefrekansları;
 
         for(Kok i : kokListe){
             if(koklervefrekansları.containsKey(i.icerik())){
@@ -87,6 +72,18 @@ public class Main  {
         }
         System.out.println(koklervefrekansları);
         System.out.println(frekansSirala(koklervefrekansları));
+        siralanmiskoklervefrekansları = frekansSirala(koklervefrekansları);
+
+        java.sql.Connection baglanti=null;
+        baglanti = baglantiyiSagla();
+
+        for(Map.Entry<String, Integer> satir : siralanmiskoklervefrekansları){
+            //INSERT INTO table (id, name, age) VALUES(1, "A", 19) ON DUPLICATE KEY UPDATE name="A", age=19
+            String query = "insert into frekanslar(kelime,frekans) values('"+ satir.getKey() +"','" + satir.getValue() + "') ON DUPLICATE KEY UPDATE frekans=(frekans+" + satir.getValue() + ")";
+            java.sql.Statement stm = baglanti.createStatement();
+            int executeUpdate = stm.executeUpdate(query);
+        }
+
     }
 
     public static <K,V extends Comparable<? super V>>
