@@ -10,24 +10,24 @@ import net.zemberek.erisim.Zemberek;
 import net.zemberek.tr.yapi.TurkiyeTurkcesi;
 import net.zemberek.yapi.KelimeTipi;
 import net.zemberek.yapi.Kok;
-import zemberek.morphology.apps.TurkishMorphParser;
 
 /**
  * Created by Master on 21.03.2016.
  */
 public class Main  {
 
-
     public static void main(String[] args) throws IOException, SQLException ,ClassNotFoundException {
         port(666);
 
+        final List<Map.Entry<String, Integer>> SiralanmisKelimeler = Lists.newArrayList();
+        final List<Map.Entry<String, Integer>> YuksekFrekanslilar = Lists.newArrayList();
         Zemberek z = new Zemberek(new TurkiyeTurkcesi());
 
         post("/MetinAl", (req, res) -> {
             List<Kok> KokList = Lists.newArrayList();
             Map<String, String> map = JsonUtil.parse(req.body());
             String textBody = map.get("text");
-            TurkishMorphParser parser = TurkishMorphParser.createWithDefaults();
+            //TurkishMorphParser parser = TurkishMorphParser.createWithDefaults();
             Tokenizator tk = new Tokenizator(textBody);
             List<String> list = tk.getWords();
             //StemLemma st = new StemLemma(parser);
@@ -45,12 +45,32 @@ public class Main  {
             }
 
             FrekansHesapla(KokList);
+            SiralanmisKelimeler.addAll(FrekansHesapla(KokList));
             KokList.clear();
             //System.out.println(koklistesi.toString());
 
             return "Başarılı!";
         });
 
+        get("/listeYenile", "application/json",(request, response) -> {
+            //java.sql.Connection baglanti = baglantiyiSagla();
+            //java.sql.Statement stm;
+
+                for(int i=0;i<5;i++){
+                    YuksekFrekanslilar.add(i,SiralanmisKelimeler.get(i));
+                }
+
+                 String post = JsonUtil.toJson(YuksekFrekanslilar);
+
+            /*String query = "SELECT * FROM frekanslar ORDER BY frekans DESC LIMIT 5";
+            stm = baglanti.createStatement();
+            int executeUpdate = stm.executeUpdate(query);
+
+            System.out.println("listeyenile");
+            response.raw();*/
+
+            return post;
+        });
 
     }
 
@@ -62,7 +82,7 @@ public class Main  {
 
     }
 
-    public static void FrekansHesapla(List<Kok> kokListe) throws Exception {
+    public static List<Map.Entry<String, Integer>> FrekansHesapla(List<Kok> kokListe) throws Exception {
         Map<String,Integer> koklervefrekansları = new HashMap<String, Integer>();
         List<Map.Entry<String,Integer>> siralanmiskoklervefrekansları;
 
@@ -79,18 +99,17 @@ public class Main  {
 
         java.sql.Connection baglanti=null;
         baglanti = baglantiyiSagla();
+        java.sql.Statement stm;
 
         for(Map.Entry<String, Integer> satir : siralanmiskoklervefrekansları){
             //INSERT INTO table (id, name, age) VALUES(1, "A", 19) ON DUPLICATE KEY UPDATE name="A", age=19
             String query = "insert into frekanslar(kelime,frekans) values('"+ satir.getKey() +"','" + satir.getValue() + "') ON DUPLICATE KEY UPDATE frekans=(frekans+" + satir.getValue() + ")";
-            java.sql.Statement stm = baglanti.createStatement();
+            stm = baglanti.createStatement();
             int executeUpdate = stm.executeUpdate(query);
         }
-        koklervefrekansları.clear();
-        siralanmiskoklervefrekansları.clear();
+
         baglanti.close();
-
-
+        return siralanmiskoklervefrekansları;
     }
 
     public static <K,V extends Comparable<? super V>>

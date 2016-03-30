@@ -11,4 +11,8 @@ public class JsonUtil {
         Gson gson = new GsonBuilder().create();
         return gson.fromJson(object, Map.class);
     }
+
+    public static String toJson(Object object) {
+        return new Gson().toJson(object);
+    }
 }
