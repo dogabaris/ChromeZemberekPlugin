@@ -41,31 +41,38 @@ function SayfaFrekansListele(event) {
 	    type: 'GET', 
 	    url: 'http://localhost:666/listeYenile', 
 	    data: {}, 
-	    dataType: 'json',
-	    success: function (data) { 
+	    dataType: "text json",
+	    contentType: "application/json; charset=utf-8", 
+	    }).success(function(data) {
+	    	var alldata = "";
+			console.log(JSON.stringify(data));
+			//$('#SayfaFrekansListele').append(JSON.stringify(data));
 
-			console.log(JSON.stringify(data.topics));
-			   $.each(data.topics, function(idx, topic){
-			     $("#SayfaFrekansListele").html('<a href="' + topic.link_src + '">' + topic.link_text + "</a>");
-			   });
+			for(var i=0;i< data.length;i++)
+            {
+                    alldata += "<li>" + data[i] + "<li><hr>";
+            }	
+            //$('#SayfaFrekansListele').html(alldata);
+            $('#SayfaYuksekFrekanslilar').append(alldata);
+            console.log(alldata);
+	        //event.data.donus.txt = "Başarılı!";
+	    });
 
-	    	var json = $.parseJSON(data);
-	        //now json variable contains data in json format
-	        //let's display a few items
-	        for (var i=0;i<json.length;++i)
-	        {
-	            $('#SayfaFrekansListele').append('<div class="name">'+json[i].name+'</>');
-	        }   
-	    }
-	});
 
+	/*$(document).ajaxStop(function () {
+	    document.getElementById("SayfaFrekansListele").innerHTML = event.data.donus.txt;
+	});*/
+	
 }
-$(document).ready(function() {
-  var resp = {txt:""};
-  $("#metinAlButton").click({sonuc: resp},MetinAl);
-  $("#listeYenile").click(SayfaFrekansListele);
-});
 
+$(document).ready(function() {
+ 	var resp = {txt:""};
+  	$("#metinAlButton").click({sonuc: resp},MetinAl);
+});
+$(document).ready(function() {
+	var donus = {txt:""};
+	$("#listeYenile").click({sonuc: donus},SayfaFrekansListele);
+});
 // $(document).ready(function() {
 //     $("#listeYenile").click(function() {                
 

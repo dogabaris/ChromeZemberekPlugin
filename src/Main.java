@@ -6,6 +6,7 @@ import java.util.*;
 import static spark.Spark.*;
 
 import com.google.common.collect.Lists;
+import com.google.gson.Gson;
 import net.zemberek.erisim.Zemberek;
 import net.zemberek.tr.yapi.TurkiyeTurkcesi;
 import net.zemberek.yapi.KelimeTipi;
@@ -20,7 +21,7 @@ public class Main  {
         port(666);
 
         final List<Map.Entry<String, Integer>> SiralanmisKelimeler = Lists.newArrayList();
-        final List<Map.Entry<String, Integer>> YuksekFrekanslilar = Lists.newArrayList();
+        final String[][] YuksekFrekanslilar = new String[5][2];
         Zemberek z = new Zemberek(new TurkiyeTurkcesi());
 
         post("/MetinAl", (req, res) -> {
@@ -55,13 +56,17 @@ public class Main  {
         get("/listeYenile", "application/json",(request, response) -> {
             //java.sql.Connection baglanti = baglantiyiSagla();
             //java.sql.Statement stm;
+            Gson gson = new Gson();
 
                 for(int i=0;i<5;i++){
-                    YuksekFrekanslilar.add(i,SiralanmisKelimeler.get(i));
+                    YuksekFrekanslilar[i][1] = SiralanmisKelimeler.get(i).getValue().toString();
+                    YuksekFrekanslilar[i][0] = SiralanmisKelimeler.get(i).getKey();
+                    //YuksekFrekanslilar.get(i).set(0,SiralanmisKelimeler.get(i).getKey());
+                    //YuksekFrekanslilar[i][0]=String.valueOf(SiralanmisKelimeler.get(i).getValue());
                 }
 
-                 String post = JsonUtil.toJson(YuksekFrekanslilar);
-
+                 String post = gson.toJson(YuksekFrekanslilar);
+                //YuksekFrekanslilar.clear();
             /*String query = "SELECT * FROM frekanslar ORDER BY frekans DESC LIMIT 5";
             stm = baglanti.createStatement();
             int executeUpdate = stm.executeUpdate(query);
