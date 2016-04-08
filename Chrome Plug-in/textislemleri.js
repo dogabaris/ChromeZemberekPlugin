@@ -37,6 +37,7 @@ function MetinAl(event) {
         });
 }*/
 function SayfaFrekansListele(event) {
+	$('#SayfaYuksekFrekanslilar').append(" ");
 	$.ajax({ 
 	    type: 'GET', 
 	    url: 'http://localhost:666/listeYenile', 
@@ -44,25 +45,19 @@ function SayfaFrekansListele(event) {
 	    dataType: "text json",
 	    contentType: "application/json; charset=utf-8", 
 	    }).success(function(data) {
+	    	
 	    	var alldata = "";
 			console.log(JSON.stringify(data));
 			//$('#SayfaFrekansListele').append(JSON.stringify(data));
 
 			for(var i=0;i< data.length;i++)
             {
-                    alldata += "<li>" + data[i] + "<li><hr>";
+                    alldata += "<li>" + data[i][0] + " - " + data[i][1] + "</li><hr>";
             }	
-            //$('#SayfaFrekansListele').html(alldata);
+           
             $('#SayfaYuksekFrekanslilar').append(alldata);
             console.log(alldata);
-	        //event.data.donus.txt = "Başarılı!";
 	    });
-
-
-	/*$(document).ajaxStop(function () {
-	    document.getElementById("SayfaFrekansListele").innerHTML = event.data.donus.txt;
-	});*/
-	
 }
 
 $(document).ready(function() {
@@ -70,8 +65,7 @@ $(document).ready(function() {
   	$("#metinAlButton").click({sonuc: resp},MetinAl);
 });
 $(document).ready(function() {
-	var donus = {txt:""};
-	$("#listeYenile").click({sonuc: donus},SayfaFrekansListele);
+	$("#listeYenile").click(SayfaFrekansListele);
 });
 // $(document).ready(function() {
 //     $("#listeYenile").click(function() {                

@@ -65,8 +65,8 @@ public class Main  {
                     //YuksekFrekanslilar[i][0]=String.valueOf(SiralanmisKelimeler.get(i).getValue());
                 }
 
-                 String post = gson.toJson(YuksekFrekanslilar);
-                //YuksekFrekanslilar.clear();
+                String post = gson.toJson(YuksekFrekanslilar);
+
             /*String query = "SELECT * FROM frekanslar ORDER BY frekans DESC LIMIT 5";
             stm = baglanti.createStatement();
             int executeUpdate = stm.executeUpdate(query);
