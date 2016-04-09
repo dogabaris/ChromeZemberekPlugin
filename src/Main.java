@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.sql.Array;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.*;
@@ -16,12 +17,10 @@ import net.zemberek.yapi.Kok;
  * Created by Master on 21.03.2016.
  */
 public class Main  {
-
     public static void main(String[] args) throws IOException, SQLException ,ClassNotFoundException {
         port(666);
 
-        final List<Map.Entry<String, Integer>> SiralanmisKelimeler = Lists.newArrayList();
-        final String[][] YuksekFrekanslilar = new String[5][2];
+        List<Map.Entry<String, Integer>> SiralanmisKelimeler = Lists.newArrayList();
         Zemberek z = new Zemberek(new TurkiyeTurkcesi());
 
         post("/MetinAl", (req, res) -> {
@@ -45,7 +44,7 @@ public class Main  {
                 kokler = null;
             }
 
-            FrekansHesapla(KokList);
+            //FrekansHesapla(KokList);
             SiralanmisKelimeler.addAll(FrekansHesapla(KokList));
             KokList.clear();
             //System.out.println(koklistesi.toString());
@@ -53,19 +52,33 @@ public class Main  {
             return "Başarılı!";
         });
 
-        get("/listeYenile", "application/json",(request, response) -> {
+        get("/listeYenile",(request, response) -> {
+            ArrayList<ArrayList<String>> yuksekFrekanslilar = Lists.newArrayList();
             //java.sql.Connection baglanti = baglantiyiSagla();
             //java.sql.Statement stm;
+            String[][] YuksekFrekanslilar = new String[5][2];
             Gson gson = new Gson();
 
                 for(int i=0;i<5;i++){
-                    YuksekFrekanslilar[i][1] = SiralanmisKelimeler.get(i).getValue().toString();
-                    YuksekFrekanslilar[i][0] = SiralanmisKelimeler.get(i).getKey();
-                    //YuksekFrekanslilar.get(i).set(0,SiralanmisKelimeler.get(i).getKey());
-                    //YuksekFrekanslilar[i][0]=String.valueOf(SiralanmisKelimeler.get(i).getValue());
+                    yuksekFrekanslilar.add(i, new ArrayList<String>());
+                    yuksekFrekanslilar.get(i).add(0,"key");
+                    yuksekFrekanslilar.get(i).add(1,"value");
                 }
 
-                String post = gson.toJson(YuksekFrekanslilar);
+                for(int i=0;i<5;i++){
+                    //YuksekFrekanslilar[i][1] = SiralanmisKelimeler.get(i).getValue().toString();
+                    //YuksekFrekanslilar[i][0] = SiralanmisKelimeler.get(i).getKey();
+                    //yuksekFrekanslilar.add(i,);
+                    yuksekFrekanslilar.get(i).set(0, SiralanmisKelimeler.get(i).getKey());
+                    yuksekFrekanslilar.get(i).set(1, String.valueOf(SiralanmisKelimeler.get(i).getValue()));
+                }
+
+            String post = gson.toJson(yuksekFrekanslilar);
+            yuksekFrekanslilar.clear();
+            SiralanmisKelimeler.clear();
+            //Arrays.fill(YuksekFrekanslilar, null);
+            //YuksekFrekanslilar= new String[5][2];
+            //YuksekFrekanslilar = String[5][2];
 
             /*String query = "SELECT * FROM frekanslar ORDER BY frekans DESC LIMIT 5";
             stm = baglanti.createStatement();

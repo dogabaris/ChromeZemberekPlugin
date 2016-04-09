@@ -37,7 +37,7 @@ function MetinAl(event) {
         });
 }*/
 function SayfaFrekansListele(event) {
-	$('#SayfaYuksekFrekanslilar').append(" ");
+	$('#SayfaYuksekFrekanslilar').empty();
 	$.ajax({ 
 	    type: 'GET', 
 	    url: 'http://localhost:666/listeYenile', 
