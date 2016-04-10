@@ -1,7 +1,5 @@
 import java.io.IOException;
-import java.sql.Array;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.*;
 
 import static spark.Spark.*;
@@ -54,38 +52,49 @@ public class Main  {
 
         get("/listeYenile",(request, response) -> {
             ArrayList<ArrayList<String>> yuksekFrekanslilar = Lists.newArrayList();
-            //java.sql.Connection baglanti = baglantiyiSagla();
-            //java.sql.Statement stm;
-            String[][] YuksekFrekanslilar = new String[5][2];
             Gson gson = new Gson();
 
-                for(int i=0;i<5;i++){
-                    yuksekFrekanslilar.add(i, new ArrayList<String>());
-                    yuksekFrekanslilar.get(i).add(0,"key");
-                    yuksekFrekanslilar.get(i).add(1,"value");
-                }
+            for(int i=0;i<5;i++){
+                yuksekFrekanslilar.add(i, new ArrayList<String>());
+                yuksekFrekanslilar.get(i).add(0,"key");
+                yuksekFrekanslilar.get(i).add(1,"value");
+            }
 
-                for(int i=0;i<5;i++){
-                    //YuksekFrekanslilar[i][1] = SiralanmisKelimeler.get(i).getValue().toString();
-                    //YuksekFrekanslilar[i][0] = SiralanmisKelimeler.get(i).getKey();
-                    //yuksekFrekanslilar.add(i,);
-                    yuksekFrekanslilar.get(i).set(0, SiralanmisKelimeler.get(i).getKey());
-                    yuksekFrekanslilar.get(i).set(1, String.valueOf(SiralanmisKelimeler.get(i).getValue()));
-                }
+            for(int i=0;i<5;i++){
+                yuksekFrekanslilar.get(i).set(0, SiralanmisKelimeler.get(i).getKey());
+                yuksekFrekanslilar.get(i).set(1, String.valueOf(SiralanmisKelimeler.get(i).getValue()));
+            }
 
             String post = gson.toJson(yuksekFrekanslilar);
             yuksekFrekanslilar.clear();
             SiralanmisKelimeler.clear();
-            //Arrays.fill(YuksekFrekanslilar, null);
-            //YuksekFrekanslilar= new String[5][2];
-            //YuksekFrekanslilar = String[5][2];
 
-            /*String query = "SELECT * FROM frekanslar ORDER BY frekans DESC LIMIT 5";
+            return post;
+        });
+        get("/veritabanilisteYenile",(request, response) -> {
+            ArrayList<ArrayList<String>> yuksekFrekanslilar = Lists.newArrayList();
+            java.sql.Connection baglanti = baglantiyiSagla();
+            java.sql.Statement stm;
+            Gson gson = new Gson();
+            int iterator=0;
+
+            String query = "SELECT * FROM frekanslar ORDER BY frekans DESC LIMIT 5";
             stm = baglanti.createStatement();
-            int executeUpdate = stm.executeUpdate(query);
+            ResultSet frekans = stm.executeQuery(query);
 
-            System.out.println("listeyenile");
-            response.raw();*/
+            while (frekans.next()) {
+                String word = frekans.getString("kelime");
+                int freq = frekans.getInt("frekans");
+
+                yuksekFrekanslilar.add(iterator, new ArrayList<String>());
+                yuksekFrekanslilar.get(iterator).add(0, word);
+                yuksekFrekanslilar.get(iterator).add(1, String.valueOf(freq));
+                iterator++;
+            }
+
+            String post = gson.toJson(yuksekFrekanslilar);
+            yuksekFrekanslilar.clear();
+            SiralanmisKelimeler.clear();
 
             return post;
         });
