@@ -17,9 +17,9 @@ function MetinAl(event) {
 
 	});
 
-	 $(document).ajaxStop(function () {
+	$(document).ajaxStop(function () {
 	    document.getElementById("sonuctext").innerHTML = event.data.sonuc.txt;
-	 });
+	});
 }
 function SayfaFrekansListele(event) {
 	highlights = "";
@@ -76,8 +76,13 @@ function VeritabaniFrekansListele(event) {
 	    });
 }
 function AltiniCiz(event){
+	/*document.addEventListener("DOMContentLoaded", function() {
+	    myHilitor = new Hilitor2("playground");
+	    myHilitor.setMatchType("left");
+	  }, false);
+	*/
 	chrome.tabs.executeScript({
-		code: "var myHilitor = new Hilitor2(); myHilitor.apply(\""+highlights+"\");"
+		code: "var myHilitor = new Hilitor2(); myHilitor.setMatchType(\"left\"); myHilitor.apply(\""+highlights+"\");"
 	});
 }
 

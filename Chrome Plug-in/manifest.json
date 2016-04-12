@@ -7,7 +7,7 @@
    "content_scripts": [ {
       "all_frames": false,
      
-      "js": [  "textislemleri.js","angular.min.js","jquery.min.js" ,"hilitor-utf8.js"],
+      "js": [  "textislemleri.js","jquery.min.js" ,"hilitor-utf8.js"],
       "matches": [ "http://*/*", "https://*/*" ],
       "run_at": "document_start"
    } ],

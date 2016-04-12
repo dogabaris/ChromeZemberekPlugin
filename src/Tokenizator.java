@@ -13,7 +13,6 @@ public class Tokenizator {// isimse al
     List<String> ret = new ArrayList<>();
 
     Tokenizator(String input) {
-
         this.lexer = new ZemberekLexer();//değiştirilebilir
         System.out.println("Input = " + input);
         Iterator<Token> tokenIterator = lexer.getTokenIterator(input);
