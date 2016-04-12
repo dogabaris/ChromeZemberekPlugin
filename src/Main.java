@@ -55,14 +55,24 @@ public class Main  {
             Gson gson = new Gson();
 
             for(int i=0;i<5;i++){
-                yuksekFrekanslilar.add(i, new ArrayList<String>());
-                yuksekFrekanslilar.get(i).add(0,"key");
-                yuksekFrekanslilar.get(i).add(1,"value");
+                try{
+                    yuksekFrekanslilar.add(i, new ArrayList<String>());
+                    yuksekFrekanslilar.get(i).add(0,"");
+                    yuksekFrekanslilar.get(i).add(1,"");
+                }catch (IndexOutOfBoundsException e){
+
+                }
+
             }
 
             for(int i=0;i<5;i++){
-                yuksekFrekanslilar.get(i).set(0, SiralanmisKelimeler.get(i).getKey());
-                yuksekFrekanslilar.get(i).set(1, String.valueOf(SiralanmisKelimeler.get(i).getValue()));
+                try {
+                    yuksekFrekanslilar.get(i).set(0, SiralanmisKelimeler.get(i).getKey());
+                    yuksekFrekanslilar.get(i).set(1, String.valueOf(SiralanmisKelimeler.get(i).getValue()));
+                }
+                catch(IndexOutOfBoundsException e){
+
+                }
             }
 
             String post = gson.toJson(yuksekFrekanslilar);

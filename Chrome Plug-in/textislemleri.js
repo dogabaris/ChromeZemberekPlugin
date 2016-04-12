@@ -22,6 +22,7 @@ function MetinAl(event) {
 	 });
 }
 function SayfaFrekansListele(event) {
+	highlights = "";
 	$('#SayfaYuksekFrekanslilar').empty();
 	$.ajax({ 
 	    type: 'GET', 
@@ -30,18 +31,25 @@ function SayfaFrekansListele(event) {
 	    dataType: "text json",
 	    contentType: "application/json; charset=utf-8", 
 	    }).success(function(data) {
-	    	
+	    	sayfaFreq=data;
 	    	var alldata = "";
+	    	//var highlights = "";
 			console.log(JSON.stringify(data));
 			//$('#SayfaFrekansListele').append(JSON.stringify(data));
 
 			for(var i=0;i< data.length;i++)
             {
-                    alldata += "<li>" + data[i][0] + " - " + data[i][1] + "</li><hr>";
+                alldata += "<li>" + data[i][0] + " - " + data[i][1] + "</li><hr>";
             }	
            
             $('#SayfaYuksekFrekanslilar').append(alldata);
-            console.log(alldata);
+
+            for(var i=0;i< data.length;i++)
+            {
+            	highlights += data[i][0] + " ";
+            }
+
+            console.log(highlights);
 	    });
 }
 function VeritabaniFrekansListele(event) {
@@ -68,30 +76,15 @@ function VeritabaniFrekansListele(event) {
 	    });
 }
 function AltiniCiz(event){
-	var myHilitor; // global variable
-	  document.addEventListener("DOMContentLoaded", function() {
-	    myHilitor = new Hilitor("content");
-	    myHilitor.apply("televizyon");
-	  }, false);
-
-}
-function Temizle(event){
-	myHilitor.remove();
+	chrome.tabs.executeScript({
+		code: "var myHilitor = new Hilitor2(); myHilitor.apply(\""+highlights+"\");"
+	});
 }
 
 $(document).ready(function() {
  	var resp = {txt:""};
   	$("#metinAlButton").click({sonuc: resp},MetinAl);
-});
-$(document).ready(function() {
-	$("#listeYenile").click(SayfaFrekansListele);
-});
-$(document).ready(function() {
-	$("#veritabanilisteYenile").click(VeritabaniFrekansListele);
-});
-$(document).ready(function() {
-	$("#highlightBtn").click(AltiniCiz);
-});
-$(document).ready(function() {
-	$("#highlightsilBtn").click(Temizle);
+  	$("#listeYenile").click(SayfaFrekansListele);
+  	$("#veritabanilisteYenile").click(VeritabaniFrekansListele);
+  	$("#highlightBtn").click(AltiniCiz);
 });
