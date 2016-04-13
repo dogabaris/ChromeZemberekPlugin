@@ -25,10 +25,9 @@ public class Main  {
             List<Kok> KokList = Lists.newArrayList();
             Map<String, String> map = JsonUtil.parse(req.body());
             String textBody = map.get("text");
-            //TurkishMorphParser parser = TurkishMorphParser.createWithDefaults();
             Tokenizator tk = new Tokenizator(textBody);
             List<String> list = tk.getWords();
-            //StemLemma st = new StemLemma(parser);
+
 
             for(String l: list){
                 //Kelime[] cozumler = z.kelimeCozumle(l);
