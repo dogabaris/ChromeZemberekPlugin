@@ -56,12 +56,14 @@ public class Main  {
 
                 kokler = null;
             }
-            System.out.println(kelimeList);
+            //System.out.println(kelimeList);
             //KokList.add(0,(Kok) kelimeList.get(0));
             //FrekansHesapla(KokList);
             //kelimeList.addAll(KokList)
             //KokList.add(0, kelimeList.get(0));
-
+            System.out.println("Kök listesi:");
+            System.out.println(KokList);
+            System.out.println("Kelime listesi:");
             SiralanmisKelimeler.addAll(FrekansHesapla(kelimeList));
             KokList.clear();
             //System.out.println(koklistesi.toString());
