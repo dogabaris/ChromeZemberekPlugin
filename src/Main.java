@@ -8,8 +8,10 @@ import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import net.zemberek.erisim.Zemberek;
 import net.zemberek.tr.yapi.TurkiyeTurkcesi;
+import net.zemberek.yapi.Kelime;
 import net.zemberek.yapi.KelimeTipi;
 import net.zemberek.yapi.Kok;
+import net.zemberek.yapi.ek.Ek;
 
 /**
  * Created by Master on 21.03.2016.
@@ -21,28 +23,47 @@ public class Main  {
         List<Map.Entry<String, Integer>> SiralanmisKelimeler = Lists.newArrayList();
         Zemberek z = new Zemberek(new TurkiyeTurkcesi());
 
+
         post("/MetinAl", (req, res) -> {
             List<Kok> KokList = Lists.newArrayList();
+            List<String> kelimeList = Lists.newArrayList();
+            List<Kok> objectList = Lists.newArrayList();
             Map<String, String> map = JsonUtil.parse(req.body());
             String textBody = map.get("text");
             Tokenizator tk = new Tokenizator(textBody);
             List<String> list = tk.getWords();
-
+            int kokiterator = 0;
 
             for(String l: list){
                 //Kelime[] cozumler = z.kelimeCozumle(l);
                 Kok[] kokler = z.kokBulucu().kokBul(l);
+                Kelime[] cozumler  = z.kelimeCozumle(l);
+                //System.out.println("*** " + Arrays.toString(cozumler));
+
                 for(Kok k : kokler){
                     if(k.tip().equals(KelimeTipi.ISIM)){
-                        System.out.println(k.icerik());
+                        //System.out.println(k.icerik());
                         KokList.add(k);
+                        //kelimeList.add(k.icerik());
+                        kelimeList.add("");
+                        for(Kelime s : cozumler){
+                                kelimeList.set(kokiterator,z.kelimeUret(KokList.get(kokiterator),s.ekler()));
+                                //Kok cevrim = (Kok) kelimeList.get(kokiterator);
+
+                        }
+                        kokiterator++;
                     }
                 }
+
                 kokler = null;
             }
-
+            System.out.println(kelimeList);
+            //KokList.add(0,(Kok) kelimeList.get(0));
             //FrekansHesapla(KokList);
-            SiralanmisKelimeler.addAll(FrekansHesapla(KokList));
+            //kelimeList.addAll(KokList)
+            //KokList.add(0, kelimeList.get(0));
+
+            SiralanmisKelimeler.addAll(FrekansHesapla(kelimeList));
             KokList.clear();
             //System.out.println(koklistesi.toString());
 
@@ -114,19 +135,20 @@ public class Main  {
         Class.forName("com.mysql.jdbc.Driver");
         java.sql.Connection baglanti=null;
         baglanti=DriverManager.getConnection("jdbc:mysql://localhost/googleplugin?useUnicode=true&characterEncoding=utf-8","root","");
+        //baglanti.setAutoCommit(false);
         return baglanti;
 
     }
 
-    public static List<Map.Entry<String, Integer>> FrekansHesapla(List<Kok> kokListe) throws Exception {
+    public static List<Map.Entry<String, Integer>> FrekansHesapla(List<String> kokListe) throws Exception {
         Map<String,Integer> koklervefrekansları = new HashMap<String, Integer>();
         List<Map.Entry<String,Integer>> siralanmiskoklervefrekansları;
 
-        for(Kok i : kokListe){
-            if(koklervefrekansları.containsKey(i.icerik())){
-                koklervefrekansları.put(i.icerik(),koklervefrekansları.get(i.icerik())+1);
+        for(String i : kokListe){
+            if(koklervefrekansları.containsKey(i)){
+                koklervefrekansları.put(i,koklervefrekansları.get(i)+1);
             }else{
-                koklervefrekansları.put(i.icerik(),1);
+                koklervefrekansları.put(i,1);
             }
         }
         System.out.println(koklervefrekansları);
@@ -137,13 +159,14 @@ public class Main  {
         baglanti = baglantiyiSagla();
         java.sql.Statement stm;
 
+        stm = baglanti.createStatement();
         for(Map.Entry<String, Integer> satir : siralanmiskoklervefrekansları){
             //INSERT INTO table (id, name, age) VALUES(1, "A", 19) ON DUPLICATE KEY UPDATE name="A", age=19
             String query = "insert into frekanslar(kelime,frekans) values('"+ satir.getKey() +"','" + satir.getValue() + "') ON DUPLICATE KEY UPDATE frekans=(frekans+" + satir.getValue() + ")";
-            stm = baglanti.createStatement();
+
             int executeUpdate = stm.executeUpdate(query);
         }
-
+        stm.close();
         baglanti.close();
         return siralanmiskoklervefrekansları;
     }
