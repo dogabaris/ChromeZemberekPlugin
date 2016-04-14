@@ -11,7 +11,6 @@ import net.zemberek.tr.yapi.TurkiyeTurkcesi;
 import net.zemberek.yapi.Kelime;
 import net.zemberek.yapi.KelimeTipi;
 import net.zemberek.yapi.Kok;
-import net.zemberek.yapi.ek.Ek;
 
 /**
  * Created by Master on 21.03.2016.
@@ -30,7 +29,7 @@ public class Main  {
             List<Kok> objectList = Lists.newArrayList();
             Map<String, String> map = JsonUtil.parse(req.body());
             String textBody = map.get("text");
-            Tokenizator tk = new Tokenizator(textBody);
+            Tokener tk = new Tokener(textBody);
             List<String> list = tk.getWords();
             int kokiterator = 0;
 

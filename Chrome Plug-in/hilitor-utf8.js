@@ -45,11 +45,13 @@ function Hilitor2(id, tag)
     retval = retval.replace(/\\u00F[46]/ig, "o");
     retval = retval.replace(/\\u00F[9BC]/ig, "u");
     retval = retval.replace(/\\u00FF/ig, "y");
+    retval = retval.replace(/\\u00DC/ig, "u");
+    retval = retval.replace(/\\u00C7/ig, "c");
     retval = retval.replace(/\\u00DF/ig, "s");
     retval = retval.replace(/a/ig, "([aàâä]|ae)");
     retval = retval.replace(/c/ig, "[cç]");
     retval = retval.replace(/e/ig, "[eèéêë]");
-    retval = retval.replace(/i/ig, "[iîï]");
+    retval = retval.replace(/i/ig, "[iîïı]");
     retval = retval.replace(/o/ig, "([oôö]|oe)");
     retval = retval.replace(/u/ig, "[uùûü]");
     retval = retval.replace(/y/ig, "[yÿ]");
