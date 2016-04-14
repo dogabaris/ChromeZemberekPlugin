@@ -11,6 +11,9 @@ import net.zemberek.tr.yapi.TurkiyeTurkcesi;
 import net.zemberek.yapi.Kelime;
 import net.zemberek.yapi.KelimeTipi;
 import net.zemberek.yapi.Kok;
+import net.zemberek.yapi.ek.Ek;
+import net.zemberek.yapi.ek.EkKuralBilgisi;
+import net.zemberek.yapi.ek.EkOzelDurumTipi;
 
 /**
  * Created by Master on 21.03.2016.
@@ -26,28 +29,47 @@ public class Main  {
         post("/MetinAl", (req, res) -> {
             List<Kok> KokList = Lists.newArrayList();
             List<String> kelimeList = Lists.newArrayList();
-            List<Kok> objectList = Lists.newArrayList();
             Map<String, String> map = JsonUtil.parse(req.body());
             String textBody = map.get("text");
             Tokener tk = new Tokener(textBody);
             List<String> list = tk.getWords();
             int kokiterator = 0;
+            int gereksizkokiteratoru=0;
 
             for(String l: list){
                 //Kelime[] cozumler = z.kelimeCozumle(l);
                 Kok[] kokler = z.kokBulucu().kokBul(l);
                 Kelime[] cozumler  = z.kelimeCozumle(l);
-                //System.out.println("*** " + Arrays.toString(cozumler));
+
+                /*for(Kelime c : cozumler){
+                    if ((Arrays.toString(cozumler).contains("ISIM_DONUSUM_LES")
+                            || (Arrays.toString(cozumler).contains("ISIM_BULUNMA_LI")) ||
+                            (Arrays.toString(cozumler).contains("ISIM_ILGI_CI")) ||
+                            (Arrays.toString(cozumler).contains("ISIM_YOKLUK_SIZ")))){
+                            cozumler[gereksizkokiteratoru];
+                        gereksizkokiteratoru++;
+                    }
+                }*/
 
                 for(Kok k : kokler){
-                    if(k.tip().equals(KelimeTipi.ISIM)){
-                        //System.out.println(k.icerik());
+                    if(k.tip().equals(KelimeTipi.ISIM) ){
                         KokList.add(k);
-                        //kelimeList.add(k.icerik());
                         kelimeList.add("");
                         for(Kelime s : cozumler){
-                                kelimeList.set(kokiterator,z.kelimeUret(KokList.get(kokiterator),s.ekler()));
-                                //Kok cevrim = (Kok) kelimeList.get(kokiterator);
+                                List<net.zemberek.yapi.ek.Ek> yeni_ekler = s.ekler();
+                                if ((s.ekVarmi("ISIM_DONUSUM_LES")
+                                        || s.ekVarmi("ISIM_BULUNMA_LI") ||
+                                        s.ekVarmi("ISIM_ILGI_CI") ||
+                                        s.ekVarmi("ISIM_YOKLUK_SIZ")|| s.ekVarmi("ISIM_YOKLUK_SIZ"))){
+                                        yeni_ekler.remove(gereksizkokiteratoru);
+                                        gereksizkokiteratoru++;
+                                }
+                                else
+                                {
+                                    kelimeList.set(kokiterator,z.kelimeUret(KokList.get(kokiterator),yeni_ekler));
+
+                                    gereksizkokiteratoru=0;
+                                }
 
                         }
                         kokiterator++;
@@ -56,17 +78,12 @@ public class Main  {
 
                 kokler = null;
             }
-            //System.out.println(kelimeList);
-            //KokList.add(0,(Kok) kelimeList.get(0));
-            //FrekansHesapla(KokList);
-            //kelimeList.addAll(KokList)
-            //KokList.add(0, kelimeList.get(0));
+
             System.out.println("Kök listesi:");
             System.out.println(KokList);
             System.out.println("Kelime listesi:");
             SiralanmisKelimeler.addAll(FrekansHesapla(kelimeList));
             KokList.clear();
-            //System.out.println(koklistesi.toString());
 
             return "Başarılı!";
         });
